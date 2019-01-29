@@ -1,0 +1,5 @@
+rootProject.name = 'fosdemprinter'
+include ':react-native-bluetooth-serial-next'
+project(':react-native-bluetooth-serial-next').projectDir = new File(rootProject.projectDir, '../node_modules/react-native-bluetooth-serial-next/android')
+
+include ':app'

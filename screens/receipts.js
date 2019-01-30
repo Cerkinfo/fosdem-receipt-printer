@@ -1,10 +1,10 @@
 import React, { Component } from 'react';
-import { Container, Text, Content, Body, Title, Header, Button, } from 'native-base';
+import { Container, Header, Title, Content, Card, CardItem, Thumbnail, Text, Button, Icon, Left, Body, Right } from 'native-base';
 import BluetoothSerial from 'react-native-bluetooth-serial-next'
 import { Subscribe } from 'unstated';
 import { DeviceContainer } from '../containers';
 
-export default class Receipts extends Component {
+class Transaction extends Component {
   constructor(props) {
     super(props);
 
@@ -13,6 +13,41 @@ export default class Receipts extends Component {
 
   async print(device) {
     await BluetoothSerial.device(device.id).write("PLOP\n");
+  }
+
+  render() {
+    return (
+      <Card>
+        <CardItem>
+          <Left>
+            <Body>
+              <Text>Receipt from {this.props.datetime}</Text>
+              <Text note>made by {this.props.author}</Text>
+            </Body>
+          </Left>
+        </CardItem>
+        <CardItem cardBody>
+          {this.props.products.map(x => (<Text>{x.quantity} {x.name} for {x.total_price}€</Text>))}
+        </CardItem>
+        <CardItem>
+          <Left>
+            <Button
+              onPress={() => this.print(this.props.device)}
+              transparent
+            >
+              <Icon active name="thumbs-up" />
+              <Text>Print</Text>
+            </Button>
+          </Left>
+        </CardItem>
+      </Card>
+    );
+  }
+}
+
+export default class Receipts extends Component {
+  constructor(props) {
+    super(props);
   }
 
   render() {
@@ -26,11 +61,7 @@ export default class Receipts extends Component {
               </Body>
             </Header>
             <Content>
-              <Button
-                onPress={() => this.print(device.state.current)}
-              >
-                 <Text>Test print</Text>
-              </Button>
+              <Transaction device={device.state.current} author="plop" datetime="yoyo" products={[{"name": "Jupiler", "price": 3, "quantity": 2, "total_price": 6},]}/>
             </Content>
           </Container>
 	)}

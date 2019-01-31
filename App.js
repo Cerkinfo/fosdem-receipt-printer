@@ -5,13 +5,36 @@
  */
 
 import React, { Component } from 'react';
-import { Platform, StyleSheet, Text, View, PermissionsAndroid, AsyncStorage } from 'react-native';
-import { Container, Content, Body, Title, Header, Button, } from 'native-base';
+import { Text, PermissionsAndroid, AsyncStorage, Image, StatusBar } from 'react-native';
+import { Container, Content, Body, Left, Title, Header, Button, Drawer, Icon, List, ListItem } from 'native-base';
 import BluetoothSerial from 'react-native-bluetooth-serial-next'
 import { Provider, Subscribe } from 'unstated';
 
 import { PairingScreen, ReceiptsScreen } from './screens';
 import { ScreensContainer } from './containers';
+
+class SideBar extends React.Component {
+  render() {
+    return (
+      <Subscribe to={[ScreensContainer]}>
+        {(screens) => (
+          <Container>
+            <Content>
+              <List>
+                <ListItem button onPress={() => screens.pairing()}>
+                  <Text>Scan page</Text>
+                </ListItem>
+                <ListItem button onPress={() => screens.receipt()}>
+                  <Text>Receipt page</Text>
+                </ListItem>
+              </List>
+            </Content>
+          </Container>
+        )}
+      </Subscribe>
+    );
+  }
+}
 
 class Main extends Component {
   constructor(props) {
@@ -59,22 +82,48 @@ class Main extends Component {
     }
   }
 
+  closeDrawer() {
+    this.drawer._root.close()
+  }
+
+  openDrawer() {
+    this.drawer._root.open()
+  }
+
   render() {
     return (
       <Subscribe to={[ScreensContainer]}>
         {(screens) => (
-          (!this.state.permission) ?
+          <Drawer
+            ref={(ref) => { this.drawer = ref; }}
+            content={<SideBar/>}
+            onClose={() => this.closeDrawer()}
+          >
             <Container>
-              <Text>Enable coarse location</Text>
-              <Button
-                onPress={this.requestCoarseLocationPermission}
-                title="Ask for permission"
-              />
+              <Header>
+                <Left>
+                  <Button transparent onPress={this.openDrawer.bind(this)}>
+                    <Icon name='menu'/>
+                  </Button>
+                </Left>
+                <Body>
+                  <Title>Receipt printer</Title>
+                </Body>
+              </Header>
+              <Content>
+                {
+                  (!this.state.permission) ?
+                    <Container>
+                      <Text>Enable coarse location</Text>
+                    </Container>
+                  : screens.state.name === "screen_pairing" ?
+                    <PairingScreen />
+                  :
+                    <ReceiptsScreen />
+                }
+              </Content>
             </Container>
-          : screens.state.name === "screen_pairing" ?
-            <PairingScreen />
-          :
-            <ReceiptsScreen />
+          </Drawer>
         )}
       </Subscribe>
     );

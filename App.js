@@ -107,7 +107,7 @@ class Main extends Component {
                   </Button>
                 </Left>
                 <Body>
-                  <Title>Receipt printer</Title>
+                  <Title>{screens.state.title}</Title>
                 </Body>
               </Header>
               <Content>

@@ -136,17 +136,17 @@ class Transaction extends Component {
   render() {
     return (
       <Container>
-        <Header>
-          <Left>
-            <Body>
-              <Text>Receipt from {moment(this.props.timestamp).format("hh:mm DD/MM/YYYY")}</Text>
-              <Text note>for a total {this.props.amount}€</Text>
-            </Body>
-          </Left>
-        </Header>
         <Card>
+          <CardItem>
+            <Left>
+              <Body>
+                <Text>Receipt from {moment(this.props.timestamp).format("hh:mm DD/MM/YYYY")}</Text>
+                <Text note>for a total {this.props.amount}€</Text>
+              </Body>
+            </Left>
+          </CardItem>
           {this.props.products.map(x => (
-            <CardItem>
+            <CardItem key={x.name}>
               <Left>
                 <Icon active name="beer"/>
                 <Text>{x.quantity}x{x.name}</Text>
@@ -162,7 +162,7 @@ class Transaction extends Component {
                 onPress={() => this.print(this.props.device)}
                 transparent
               >
-                <Icon active name="right"/>
+                <Icon active name="ios-copy"/>
                 <Text>Print</Text>
               </Button>
             </Left>
@@ -183,7 +183,7 @@ export default class Receipts extends Component {
       <Subscribe to={[DeviceContainer]}>
         {(device) => (
           <Content>
-            {TEST.map(x => (<Transaction device={device.state.current} {...x.transaction_data}/>)) }
+            {TEST.map(x => (<Transaction key={x.transaction_data.transaction_code} device={device.state.current} {...x.transaction_data}/>)) }
           </Content>
 	      )}
       </Subscribe>

@@ -58,7 +58,6 @@ export default class Pairing extends Component {
     try {
       const paired = await BluetoothSerial.device(device.id).connect();
       container.set(paired);
-      await AsyncStorage.setItem("pairedDevice", device.id);
       screens.receipt();
     } catch (err) {
       return console.warn(err);

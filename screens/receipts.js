@@ -66,11 +66,6 @@ const createSumUpClient = async () => {
   });
 }
 
-const getTransations = access_token => axios.get("https://api.sumup.com/v0.1/me/transactions/history?limit=500", {
-  headers: {
-    "Authorization": `Bearer ${access_token}`
-  }
-});
 // const template = ({timestamp, products, amount}) => {
 //   let result = encoder
 //     .initialize()
@@ -127,23 +122,28 @@ class Transaction extends Component {
 
     this.state = {
        detail: null,
+       products: null,
     };
 
     this.print = this.print.bind(this);
+    this.getDetails = this.getDetails.bind(this);
   }
 
   async print(device) {
     await BluetoothSerial.device(device.id).write(template(this.props));
   }
 
-  async getDetail() {
+  async getDetails() {
     const res = await this.props.session.get(`https://api.sumup.com/v1.0/receipts/${this.props.transaction_code}?mid=MECZ73KP`);
+    this.setState({
+      products: res.data.transaction_data.products,
+    });
   }
 
   render() {
     return (
       <Container>
-        <Card onClick={this.getDetail}>
+        <Card onClick={this.getDetails}>
           <CardItem>
             <Left>
               <Body>
@@ -153,7 +153,7 @@ class Transaction extends Component {
               </Body>
             </Left>
           </CardItem>
-          {this.state.detail && this.state.detail.products.map(x => (
+          {this.state.products && this.state.products.map(x => (
             <CardItem key={x.name}>
               <Left>
                 <Icon active name="beer"/>
@@ -174,6 +174,15 @@ class Transaction extends Component {
                 <Text>Print</Text>
               </Button>
             </Left>
+            <Right>
+              <Button
+                onPress={this.getDetails}
+                transparent
+              >
+                <Icon active name="menu"/>
+                <Text>Details</Text>
+              </Button>
+            </Right>
           </CardItem>
         </Card>
       </Container>
@@ -195,7 +204,7 @@ export default class Receipts extends Component {
 
   async componentDidMount() {
     this.sesssion = await createSumUpClient();
-    const response = await this.session.get("https://api.sumup.com/v0.1/me/transactions/history?limit=500");
+    const response = await this.session.get("https://api.sumup.com/v0.1/me/transactions/history?limit=500&order=descending");
     this.setState({
       transactions: response.data.items
     });
